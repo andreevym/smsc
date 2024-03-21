@@ -9,31 +9,6 @@ import (
 	"strings"
 )
 
-// Константы для типов ошибок
-const (
-	ErrorBadRequest          = 1
-	ErrorInvalidCredentials  = 2
-	ErrorInsufficientFunds   = 3
-	ErrorIPBlocked           = 4
-	ErrorInvalidDateFormat   = 5
-	ErrorMessageForbidden    = 6
-	ErrorInvalidPhoneNumber  = 7
-	ErrorMessageNotDelivered = 8
-	ErrorDuplicateRequest    = 9
-)
-
-var errorDescriptions = map[int]string{
-	ErrorBadRequest:          "Ошибка в параметрах",
-	ErrorInvalidCredentials:  "Неверный логин или пароль",
-	ErrorInsufficientFunds:   "Недостаточно средств на счете",
-	ErrorIPBlocked:           "IP-адрес временно заблокирован",
-	ErrorInvalidDateFormat:   "Неверный формат даты",
-	ErrorMessageForbidden:    "Сообщение запрещено",
-	ErrorInvalidPhoneNumber:  "Неверный формат номера телефона",
-	ErrorMessageNotDelivered: "Сообщение не может быть доставлено",
-	ErrorDuplicateRequest:    "Дублирование запроса",
-}
-
 // Response структура для ответа сервера
 type Response struct {
 	ID        int        `json:"id"`         // идентификатор сообщения, переданный Клиентом или назначенный Сервером автоматически.
@@ -49,6 +24,7 @@ type Response struct {
 		Status string `json:"status"` // код статуса SMS-сообщения.
 		Error  string `json:"error"`  // код ошибки в статусе.
 	} `json:"phones"`
+	ErrorMessage string `json:"error_message"` // сообщение об ошибке
 }
 
 // Константа с адресом для отправки сообщений
@@ -131,20 +107,15 @@ func (c *Client) SendMessage(message *Message) (Response, error) {
 
 	// Проверка наличия ошибки в ответе
 	if len(response.Error) > 0 || response.ErrorCode > 0 {
-		return Response{}, errors.New(response.Error)
+		return response, errors.New(response.Error)
 	}
 
 	// Проверка наличия ошибки в ответе
 	for _, phone := range response.Phones {
 		if len(phone.Error) != 0 {
-			return Response{}, errors.New(phone.Error)
+			return response, errors.New(phone.Error)
 		}
 	}
 
 	return response, nil
-}
-
-// ParseErrorCode Метод для парсинга кода ошибки
-func ParseErrorCode(errorCode int) string {
-	return errorDescriptions[errorCode]
 }

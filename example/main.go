@@ -24,7 +24,7 @@ func main() {
 	// Отправка сообщения
 	response, err := client.SendMessage(message)
 	if err != nil {
-		fmt.Println(fmt.Errorf("failed to send message: '%s', %w", smsc.ParseErrorCode(response.ErrorCode), err))
+		fmt.Println(fmt.Errorf("failed to send message: %w", err))
 		return
 	}
 
