@@ -116,4 +116,4 @@ func main() {
 - [Исходный код: Исходный код библиотеки на GitHub.](https://github.com/andreevym/smsc)
 
 ## Лицензия
-Этот проект лицензирован под MIT License.
+Этот проект лицензирован под [MIT License](LICENSE).
